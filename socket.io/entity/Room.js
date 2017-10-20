@@ -1,54 +1,50 @@
-const MAX_EMOTION_LENGTH = 100;
+const Util = require('../Util');
 
 class Room {
-  constructor(id, user, passPhrase = null) {
-    this.id = id;
-    this.masterUserId = user.id;
-    this.passPhrase = passPhrase;
-    this.emotions = [];
+  constructor(user) {
+    this.id = user.id;
     this.emotionCountById = {};
-    this.users = {
-      [user.id]: user,
+    this.users = { [user.id]: user };
+    this.endTime = Util.getTimestamp() + (60 * 30);
+    this.maxUserCount = 0;
+  }
+
+  getCurrentUserCount() {
+    return Object.keys(this.users).length;
+  }
+
+  getRoomParams() {
+    const { emotionCountById, maxUserCount } = this;
+    const remainTime = this.endTime - Util.getTimestamp();
+    const currentUserCount = this.getCurrentUserCount();
+
+    return {
+      remainTime,
+      emotionCountById,
+      maxUserCount,
+      currentUserCount,
     };
   }
 
-  addUser(user, passPhrase) {
-    if (this.passPhrase !== null) {
-      if (this.passPhrase !== passPhrase) {
-        return false;
-      }
-    }
-
+  setUser(user) {
     this.users[user.id] = user;
-    return true;
+    const count = this.getCurrentUserCount();
+    if (count > this.maxUserCount) {
+      this.maxUserCount = count;
+    }
   }
 
   delUser(id) {
-    delete this.users[id];
+    if (this.users[id] !== undefined) {
+      delete this.users[id];
+    }
   }
 
-  addEmotion(emotion) {
-    if (this.emotions.length >= MAX_EMOTION_LENGTH) {
-      const deleteSize = this.emotions.length - MAX_EMOTION_LENGTH;
-      this.emotions.splice(0, deleteSize + 1);
-    }
-
-    this.emotions.push(emotion);
-
-    const id = emotion.id;
+  addEmotion(id) {
     if (this.emotionCountById[id] === undefined) {
       this.emotionCountById[id] = 0;
     }
     this.emotionCountById[id]++;
-  }
-
-  getUsers() {
-    const obj = {};
-    Object.values(this.users).forEach((user) => {
-      obj[user.id] = user.toJSON();
-    });
-
-    return obj;
   }
 }
 

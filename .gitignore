@@ -2,3 +2,8 @@
 .vagrant
 node_modules
 vendor
+logs/*
+.twitter-secrets
+.twitter-secrets-production
+
+!.gitkeep

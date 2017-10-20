@@ -2,7 +2,8 @@ const Https = require('https');
 const fs = require('fs');
 const SocketIO = require('socket.io');
 
-const StreamingServer = require('./manager/StreamingServer');
+const User = require('./entity/User');
+const ServerManager = require('./manager/ServerManager');
 
 const httpsServer = Https.createServer({
   key: fs.readFileSync('/etc/ssl/private/localhost.key').toString(),
@@ -18,11 +19,13 @@ const io = SocketIO.listen(
   }
 );
 
-const server = new StreamingServer(io);
+const server = new ServerManager(io);
 
 const authenticate = (clientSocket, next) => {
   // この辺でユーザー認証
-  clientSocket.userId = clientSocket.handshake.query.id;
+  const { userId, roomId } = clientSocket.handshake.query;
+  clientSocket.user = new User(userId, clientSocket);
+  clientSocket.roomId = roomId;
   next();
 };
 

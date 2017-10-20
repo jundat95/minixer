@@ -1,0 +1,32 @@
+{
+    "require": {
+        "silex/silex": "~2.0",
+        "php-di/php-di": "^5.4",
+        "monolog/monolog": "^1.23",
+        "phpunit/phpunit": "^6.2",
+        "gree/magic-spice": "dev-master",
+        "symfony/console": "^3.3",
+        "guzzlehttp/guzzle": "~6.0",
+        "doctrine/cache": "^1.6",
+        "twig/twig": "^2.4"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pullphone/MagicSpice"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/nrk/PredisServiceProvider"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Minixer\\": "backend/classes/",
+            "Minixer\\Tests\\": "backend/tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.3"
+    }
+}

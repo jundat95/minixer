@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
     chef.cookbooks_path = "chef-cookbooks"
     chef.run_list = [
       "recipe[redis]",
+      "recipe[memcached]",
       "recipe[node]",
       "recipe[php71]",
       "recipe[apache2]",

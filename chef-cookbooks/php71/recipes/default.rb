@@ -13,6 +13,8 @@ end
   php7.1-dom
   php7.1-apcu
   php7.1-redis
+  php7.1-memcached
+  php7.1-oauth
 }.each do |pkg|
   package pkg do
     action :install
