@@ -39,19 +39,37 @@ abstract class ControllerBase
 
     protected function returnTemplateResponse($name, array $data)
     {
-        $user = $this->getSessionUser();
-
-        $additionalParams = [
-            'user_json' => !empty($user) ? json_encode([
-                'id' => $user->getId(),
-                'name' => $user->getName(),
-                'token' => $user->getApiToken(),
-                'profile_image_url' => $user->getProfileImageUrlHttps(),
-            ]) : null,
+        $templateData = [
+            'json' => $this->getJsonData($data),
         ];
-        $data = array_merge($data, $additionalParams);
 
-        return $this->getTwig()->render($name, $data);
+        if (isset($data['json'])) {
+            unset($data['json']);
+        }
+        if (!empty($data)) {
+            $templateData = array_merge($templateData, $data);
+        }
+
+        return $this->getTwig()->render($name, $templateData);
+    }
+
+    protected function getJsonData($data)
+    {
+        $user = $this->getSessionUser();
+        $responseData = [
+            'user' => !empty($user) ? [
+                'id' => $user->getId(),
+                'token' => $user->getApiToken(),
+                'name' => $user->getName(),
+                'profile_image' => $user->getProfileImageUrl(),
+            ] : null,
+        ];
+
+        if (isset($data['json'])) {
+            $responseData = array_merge($responseData, $data['json']);
+        }
+
+        return json_encode($responseData);
     }
 
     protected function getSessionUser()

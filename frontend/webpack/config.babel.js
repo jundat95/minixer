@@ -9,8 +9,8 @@ const src = path.resolve(__dirname, '../src');
 
 let settings = {
   entry: {
-    'pages/audio_test': ['babel-polyfill', `${src}/pages/test/audio.jsx`],
-    'pages/broadcast_test': ['babel-polyfill', `${src}/pages/test/broadcast.jsx`],
+    'pages/index': ['babel-polyfill', `${src}/pages/index.jsx`],
+    'pages/mypage': ['babel-polyfill', `${src}/pages/mypage.jsx`],
   },
   module: {
     loaders: [

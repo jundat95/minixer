@@ -126,7 +126,6 @@ class ServerManager {
       return;
     }
 
-
     const extendTime = parseInt(data, 10);
     if (isNaN(extendTime)) {
       return;

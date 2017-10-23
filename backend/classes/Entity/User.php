@@ -14,6 +14,6 @@ class User
         getStringOrNull as public getApiToken;
         getStringOrNull as public getOauthToken;
         getStringOrNull as public getOauthTokenSecret;
-        getStringOrNull as public getProfileImageUrlHttps;
+        getStringOrNull as public getProfileImageUrl;
     }
 }

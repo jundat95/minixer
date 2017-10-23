@@ -54,10 +54,9 @@ $app['resolver'] = new ControllerResolver();
 
 if ($state !== 'production') {
     $app['debug'] = true;
-    $twitterConfig = parse_ini_file(__DIR__ . '/../.twitter-secrets-production');
-} else {
-    $twitterConfig = parse_ini_file(__DIR__ . '/../.twitter-secrets');
 }
+
+$twitterConfig = parse_ini_file(__DIR__ . '/../.twitter-secrets');
 $app['TWITTER_CONSUMER_KEY'] = $twitterConfig['CONSUMER_KEY'];
 $app['TWITTER_CONSUMER_SECRET'] = $twitterConfig['CONSUMER_SECRET'];
 

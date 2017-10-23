@@ -12,7 +12,7 @@ class LoginController extends ControllerBase
     {
         $user = $this->getSessionUser();
         if (!empty($user) && !empty($user->getId())) {
-            return new RedirectResponse('/');
+            return new RedirectResponse('/mypage');
         }
 
         $consumerKey = $GLOBALS['app']['TWITTER_CONSUMER_KEY'];

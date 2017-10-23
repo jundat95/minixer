@@ -1,7 +1,6 @@
 module.exports = {
   'parser': 'babel-eslint',
   'extends': 'airbnb',
-  'plugins': ['flowtype'],
   'rules': {
     'class-methods-use-this': 0,
     'no-console': ['warn', { allow: ['warn', 'error'] }],
@@ -21,6 +20,7 @@ module.exports = {
     'no-plusplus': 0,
     'arrow-body-style': 0,
     'no-param-reassign': ['error', { props: false }],
+    'jsx-a11y/href-no-hash': 0,
   },
   'env': {
     'browser': true,
