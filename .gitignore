@@ -3,6 +3,7 @@
 node_modules
 vendor
 logs/*
+backend/public/js/pages/*
 .twitter-secrets
 .twitter-secrets-production
 
