@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 398);
+/******/ 	return __webpack_require__(__webpack_require__.s = 401);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -49475,15 +49475,18 @@ exports['default'] = thunk;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(50), __webpack_require__(147)(module)))
 
 /***/ }),
-/* 398 */
+/* 398 */,
+/* 399 */,
+/* 400 */,
+/* 401 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(154);
-module.exports = __webpack_require__(399);
+module.exports = __webpack_require__(402);
 
 
 /***/ }),
-/* 399 */
+/* 402 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49503,9 +49506,9 @@ var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
 var _redux = __webpack_require__(103);
 
-var _Index = __webpack_require__(400);
+var _Mypage = __webpack_require__(403);
 
-var _Index2 = _interopRequireDefault(_Index);
+var _Mypage2 = _interopRequireDefault(_Mypage);
 
 var _User = __webpack_require__(153);
 
@@ -49522,11 +49525,11 @@ const store = finalCreateStore(reducers);
 (0, _reactDom.render)(_react2.default.createElement(
   _reactRedux.Provider,
   { store: store },
-  _react2.default.createElement(_Index2.default, null)
+  _react2.default.createElement(_Mypage2.default, null)
 ), document.getElementById('react-content'));
 
 /***/ }),
-/* 400 */
+/* 403 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49558,10 +49561,6 @@ var _Header = __webpack_require__(521);
 
 var _Header2 = _interopRequireDefault(_Header);
 
-var _Concept = __webpack_require__(699);
-
-var _Concept2 = _interopRequireDefault(_Concept);
-
 var _FontAwesome = __webpack_require__(661);
 
 var _FontAwesome2 = _interopRequireDefault(_FontAwesome);
@@ -49570,35 +49569,55 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class Index extends _react2.default.Component {
-  renderLoginBtn() {
-    return _react2.default.createElement(
-      _reactBootstrap.Button,
-      { bsStyle: 'primary', bsSize: 'large', block: true, href: '/login' },
-      _react2.default.createElement(_FontAwesome2.default, { iconName: 'twitter' }),
-      'Sign in with Twitter'
-    );
-  }
+class Mypage extends _react2.default.Component {
+  renderProfile() {
+    const { user } = _FromServer2.default;
 
-  renderMypageBtn() {
     return _react2.default.createElement(
-      _reactBootstrap.Button,
-      { bsStyle: 'primary', bsSize: 'large', block: true, href: '/mypage' },
-      'Go to Mypage'
+      _reactBootstrap.Col,
+      { xs: 6 },
+      _react2.default.createElement(
+        _reactBootstrap.Panel,
+        { header: _react2.default.createElement(
+            'h3',
+            null,
+            'User'
+          ), bsStyle: 'info' },
+        _react2.default.createElement(
+          'div',
+          null,
+          _react2.default.createElement(_reactBootstrap.Image, { style: { width: '100%', maxWidth: 320 }, src: user.profile_image })
+        ),
+        _react2.default.createElement(
+          'h4',
+          null,
+          user.name
+        ),
+        _react2.default.createElement(
+          'p',
+          null,
+          'Twitter ID:',
+          user.id
+        )
+      )
     );
   }
 
   render() {
     const { user } = _FromServer2.default;
-    const objUser = user === null ? {} : user;
 
     return _react2.default.createElement(
       'div',
       null,
-      _react2.default.createElement(_Header2.default, { user: objUser, path: 'index' }),
+      _react2.default.createElement(_Header2.default, { user: user, path: 'mypage' }),
       _react2.default.createElement(
         _reactBootstrap.Grid,
         null,
+        _react2.default.createElement(
+          _reactBootstrap.Row,
+          null,
+          this.renderProfile()
+        ),
         _react2.default.createElement(
           _reactBootstrap.Row,
           null,
@@ -49606,34 +49625,12 @@ class Index extends _react2.default.Component {
             _reactBootstrap.Col,
             { xs: 12 },
             _react2.default.createElement(
-              _reactBootstrap.Jumbotron,
-              null,
-              _react2.default.createElement(
-                'h1',
-                null,
-                'Minixer'
-              ),
-              _react2.default.createElement(
-                'p',
-                null,
-                'Broadcasting Live Audio More Simply!'
-              )
+              _reactBootstrap.Button,
+              { bsStyle: 'primary', bsSize: 'large', href: '/broadcast', block: true },
+              _react2.default.createElement(_FontAwesome2.default, { iconName: 'bullhorn' }),
+              'Start Live Broadcast'
             )
           )
-        ),
-        _react2.default.createElement(
-          _reactBootstrap.Row,
-          null,
-          _react2.default.createElement(
-            _reactBootstrap.Col,
-            { xs: 12 },
-            user === null ? this.renderLoginBtn() : this.renderMypageBtn()
-          )
-        ),
-        _react2.default.createElement(
-          _reactBootstrap.Row,
-          null,
-          _react2.default.createElement(_Concept2.default, null)
         )
       )
     );
@@ -49647,12 +49644,9 @@ const mapDispatchToProps = dispatch => ({
   userActions: (0, _redux.bindActionCreators)(UserActions, dispatch)
 });
 
-exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Index);
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Mypage);
 
 /***/ }),
-/* 401 */,
-/* 402 */,
-/* 403 */,
 /* 404 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -68662,122 +68656,6 @@ const json = document.getElementById('json-data').textContent;
 
 exports.default = JSON.parse(json);
 
-/***/ }),
-/* 663 */,
-/* 664 */,
-/* 665 */,
-/* 666 */,
-/* 667 */,
-/* 668 */,
-/* 669 */,
-/* 670 */,
-/* 671 */,
-/* 672 */,
-/* 673 */,
-/* 674 */,
-/* 675 */,
-/* 676 */,
-/* 677 */,
-/* 678 */,
-/* 679 */,
-/* 680 */,
-/* 681 */,
-/* 682 */,
-/* 683 */,
-/* 684 */,
-/* 685 */,
-/* 686 */,
-/* 687 */,
-/* 688 */,
-/* 689 */,
-/* 690 */,
-/* 691 */,
-/* 692 */,
-/* 693 */,
-/* 694 */,
-/* 695 */,
-/* 696 */,
-/* 697 */,
-/* 698 */,
-/* 699 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(49);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactBootstrap = __webpack_require__(522);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const Concept = () => _react2.default.createElement(
-  'div',
-  null,
-  _react2.default.createElement(
-    _reactBootstrap.PageHeader,
-    null,
-    'Concept'
-  ),
-  _react2.default.createElement(
-    _reactBootstrap.ListGroup,
-    null,
-    _react2.default.createElement(
-      _reactBootstrap.ListGroupItem,
-      { header: 'Simple' },
-      _react2.default.createElement(
-        'strong',
-        null,
-        'Minixer'
-      ),
-      ' only supports live broadcasts to one-to-many.',
-      _react2.default.createElement('br', null),
-      'If you want to react to live, you can react to broadcasters on ',
-      _react2.default.createElement(
-        'strong',
-        null,
-        'Emotion'
-      ),
-      '.'
-    ),
-    _react2.default.createElement(
-      _reactBootstrap.ListGroupItem,
-      { header: 'No Social Graph' },
-      'There are no functions like comments, friends, watch lists, followers, etc.',
-      _react2.default.createElement('br', null),
-      'If you want to tell your friends that you started broadcasting, just share the ',
-      _react2.default.createElement(
-        'strong',
-        null,
-        'Room URL'
-      ),
-      ' with SNS such as Twitter or Facebook.'
-    ),
-    _react2.default.createElement(
-      _reactBootstrap.ListGroupItem,
-      { header: 'Free' },
-      'This server will be provided permanently for free and no ads will be displayed.',
-      _react2.default.createElement('br', null),
-      'Also, publishing the source code ',
-      _react2.default.createElement(
-        'a',
-        { href: 'https://github.com/pullphone/minixer' },
-        'on GitHub'
-      ),
-      ', you can build your own server.',
-      _react2.default.createElement('br', null)
-    )
-  )
-);
-
-exports.default = Concept;
-
 /***/ })
 /******/ ]);
-//# sourceMappingURL=index.bundle.js.map
+//# sourceMappingURL=mypage.bundle.js.map
