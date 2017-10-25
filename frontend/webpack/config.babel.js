@@ -11,6 +11,7 @@ let settings = {
   entry: {
     'pages/index': ['babel-polyfill', `${src}/pages/index.jsx`],
     'pages/mypage': ['babel-polyfill', `${src}/pages/mypage.jsx`],
+    'pages/broadcast': ['babel-polyfill', `${src}/pages/broadcast.jsx`],
   },
   module: {
     loaders: [

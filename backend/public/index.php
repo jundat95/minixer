@@ -44,7 +44,14 @@ $app->get('/logout', function () {
     SessionUtil::removeUser();
     return new RedirectResponse('/');
 });
+
 $app->get('/mypage', 'Minixer\\Controller\\MypageController')
     ->before($loginRequired);
+$app->get('/reload_profile', 'Minixer\\Controller\\ReloadProfileController')
+    ->before($loginRequired);
+$app->get('/broadcast', 'Minixer\\Controller\\BroadcastController')
+    ->before($loginRequired);
+
+$app->get('/api/authenticate', 'Minixer\\Controller\\Api\\AuthenticateController');
 
 $app->run();

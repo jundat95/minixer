@@ -1,29 +1,32 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Grid, Row, Col, Button, Panel, Image } from 'react-bootstrap';
+import { Grid, Row, Col, Button, Alert } from 'react-bootstrap';
 
 import * as UserActions from '../modules/User';
 
 import FromServer from '../FromServer';
 import Header from '../components/Header';
+import ProfilePanel from '../components/ProfilePanel';
 import FontAwesome from '../components/FontAwesome';
 
 class Mypage extends React.Component {
-  renderProfile() {
-    const { user } = FromServer;
+  constructor() {
+    super();
 
-    return (
-      <Col xs={6}>
-        <Panel header={(<h3>User</h3>)} bsStyle="info">
-          <div>
-            <Image style={{ width: '100%', maxWidth: 320 }} src={user.profile_image} />
-          </div>
-          <h4>{user.name}</h4>
-          <p>Twitter ID:{user.id}</p>
-        </Panel>
-      </Col>
-    );
+    this.state = {
+      loginPanel: false,
+      reloadedPanel: false,
+    };
+  }
+
+  componentWillMount() {
+    const { status } = FromServer.user;
+    if (status === 'login') {
+      this.setState({ loginPanel: true });
+    } else if (status === 'reloaded') {
+      this.setState({ reloadedPanel: true });
+    }
   }
 
   render() {
@@ -33,8 +36,24 @@ class Mypage extends React.Component {
       <div>
         <Header user={user} path="mypage" />
         <Grid>
+          {this.state.loginPanel ? (
+            <Row>
+              <Alert bsStyle="success" onDismiss={() => this.setState({ loginPanel: false })}>
+                <p>Login successful at {user.name}!</p>
+              </Alert>
+            </Row>
+          ) : null}
+          {this.state.reloadedPanel ? (
+            <Row>
+              <Alert bsStyle="success" onDismiss={() => this.setState({ reloadedPanel: false })}>
+                <p>Reload Profile successful at {user.name}!</p>
+              </Alert>
+            </Row>
+          ) : null}
           <Row>
-            {this.renderProfile()}
+            <Col xs={6}>
+              <ProfilePanel />
+            </Col>
           </Row>
           <Row>
             <Col xs={12}>

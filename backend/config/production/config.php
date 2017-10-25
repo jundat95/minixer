@@ -8,4 +8,7 @@ return [
         'level' => \Monolog\Logger::WARNING,
     ],
     'redis_key_prefix' => 'MINIXER',
+    'socket_io_servers' => [
+        'https://minixer.net:9999',
+    ],
 ];

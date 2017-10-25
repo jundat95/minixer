@@ -15,5 +15,7 @@ class User
         getStringOrNull as public getOauthToken;
         getStringOrNull as public getOauthTokenSecret;
         getStringOrNull as public getProfileImageUrl;
+        getStringOrNull as public getStatus;
+        getDateTimeImmutableOrNull as public getLastLoadedAt;
     }
 }

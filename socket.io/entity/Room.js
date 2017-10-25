@@ -7,6 +7,7 @@ class Room {
     this.users = { [user.id]: user };
     this.endTime = Util.getTimestamp() + (60 * 30);
     this.maxUserCount = 0;
+    this.isExtended = false;
   }
 
   getCurrentUserCount() {
@@ -14,12 +15,15 @@ class Room {
   }
 
   getRoomParams() {
-    const { emotionCountById, maxUserCount } = this;
-    const remainTime = this.endTime - Util.getTimestamp();
+    const { emotionCountById, maxUserCount, endTime } = this;
+    const currentTime = Util.getTimestamp();
     const currentUserCount = this.getCurrentUserCount();
+    const roomMaster = this.users[this.id];
 
     return {
-      remainTime,
+      name: roomMaster.name,
+      endTime,
+      currentTime,
       emotionCountById,
       maxUserCount,
       currentUserCount,

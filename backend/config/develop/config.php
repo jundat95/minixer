@@ -8,4 +8,10 @@ return [
         'level' => \Monolog\Logger::DEBUG,
     ],
     'redis_key_prefix' => 'MINIXER',
+    'socket_io_servers' => [
+        'https://dev.minixer.net:9999',
+    ],
+    'admin_user_ids' => [
+        '107481221',
+    ],
 ];

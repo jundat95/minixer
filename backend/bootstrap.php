@@ -25,14 +25,9 @@ if (!file_exists($statePath)) {
 }
 $GLOBALS['application_state'] = $state;
 
-$app = new Application();
 $config = Config::getInstance();
+$app = new Application([], $config);
 
-$app->register(new TwigServiceProvider(), [
-    'twig.path' => __DIR__ . '/templates',
-]);
-
-$app->register(new SessionServiceProvider());
 $app['session_memcached'] = function () {
     return Memcache::getInstance('default');
 };
@@ -42,15 +37,6 @@ $app['session.storage.handler'] = function () use ($app) {
         'expiretime' => 86400 * 30,
     ]);
 };
-
-$logConfig = $config->get('log');
-if ($logConfig['enabled']) {
-    $app->register(new MonologServiceProvider(), array(
-        'monolog.logfile' => $logConfig['dir'] . '/application.log',
-        'monolog.level' => $logConfig['level'],
-    ));
-}
-$app['resolver'] = new ControllerResolver();
 
 if ($state !== 'production') {
     $app['debug'] = true;

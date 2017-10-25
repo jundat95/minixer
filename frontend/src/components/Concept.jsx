@@ -7,7 +7,7 @@ const Concept = () => (
     <ListGroup>
       <ListGroupItem header="Simple">
         <strong>Minixer</strong> only supports live broadcasts to one-to-many.<br />
-        If you want to react to live, you can react to broadcasters on <strong>Emotion</strong>.
+        If you want to react to live, you can react to broadcasters on function called <strong>Emotion</strong>.
       </ListGroupItem>
       <ListGroupItem header="No Social Graph">
         There are no functions like comments, friends, watch lists, followers, etc.<br />

@@ -15,6 +15,11 @@ class AudioService {
     this.inputStreamSource = null;
     this.scriptProcessor = null;
 
+    this.outputGainNode = this.context.createGain();
+
+    this.analyser = this.context.createAnalyser();
+    this.analyser.fftSize = 128;
+
     this.playStartTime = 0;
   }
 
@@ -58,6 +63,7 @@ class AudioService {
       this.localStream = stream;
       this.inputStreamSource = inputStreamSource;
       this.scriptProcessor = scriptProcessor;
+      this.isCapture = true;
     });
   }
 
@@ -111,7 +117,9 @@ class AudioService {
     this.context.decodeAudioData(blob, (decodedAudio) => {
       const source = this.context.createBufferSource();
       source.buffer = decodedAudio;
-      source.connect(this.context.destination);
+      source.connect(this.outputGainNode);
+      source.connect(this.analyser);
+      this.outputGainNode.connect(this.context.destination);
 
       const { currentTime } = this.context;
       if (currentTime < this.playStartTime) {
@@ -121,6 +129,14 @@ class AudioService {
       }
       source.start(this.playStartTime);
     });
+  }
+
+  changeOutputGain(value) {
+    this.outputGainNode.gain.value = value;
+  }
+
+  getAnalyser() {
+    return this.analyser;
   }
 }
 

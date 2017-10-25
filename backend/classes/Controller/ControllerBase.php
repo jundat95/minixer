@@ -2,22 +2,15 @@
 
 namespace Minixer\Controller;
 
-use Minixer\ContainerBuilder;
-use Minixer\Entity\AdminUser;
+use Minixer\Config;
 use Minixer\Entity\User;
-use Minixer\Service\SessionService;
 use Minixer\Util\SessionUtil;
-use Minixer\Util\StringUtil;
 use Silex\Application\TwigTrait;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 abstract class ControllerBase
 {
-    private $sessionUser = null;
-
     protected function returnJsonResponse(bool $result, $data = null, $code = 200)
     {
         $responseData = ['result' => $result];
@@ -37,11 +30,16 @@ abstract class ControllerBase
         return $app['twig'];
     }
 
-    protected function returnTemplateResponse($name, array $data)
+    protected function returnTemplateResponse($name, array $data = [])
     {
+        $user = SessionUtil::getUser();
         $templateData = [
-            'json' => $this->getJsonData($data),
+            'json' => $this->getJsonData($data, $user),
         ];
+        if (!empty($user) && !empty($user->getStatus())) {
+            $newUser = $user->set(['status' => null]);
+            SessionUtil::setUser($newUser);
+        }
 
         if (isset($data['json'])) {
             unset($data['json']);
@@ -53,15 +51,18 @@ abstract class ControllerBase
         return $this->getTwig()->render($name, $templateData);
     }
 
-    protected function getJsonData($data)
+    protected function getJsonData($data, $user)
     {
-        $user = $this->getSessionUser();
+        $adminUserIds = Config::getInstance()->get('admin_user_ids');
         $responseData = [
-            'user' => !empty($user) ? [
+            'user' => ($user instanceof User) ? [
                 'id' => $user->getId(),
                 'token' => $user->getApiToken(),
                 'name' => $user->getName(),
                 'profile_image' => $user->getProfileImageUrl(),
+                'status' => $user->getStatus(),
+                'last_loaded_at' => $user->getLastLoadedAt()->getTimestamp(),
+                'is_admin_user' => in_array($user->getId(), $adminUserIds),
             ] : null,
         ];
 
@@ -70,18 +71,6 @@ abstract class ControllerBase
         }
 
         return json_encode($responseData);
-    }
-
-    protected function getSessionUser()
-    {
-        if ($this->sessionUser === null) {
-            $sessionUser = SessionUtil::getUser();
-            if (!empty($sessionUser) && $this->sessionUser === null) {
-                $this->sessionUser = new User($sessionUser);
-            }
-        }
-
-        return $this->sessionUser;
     }
 
     abstract public function __invoke(Request $request);
