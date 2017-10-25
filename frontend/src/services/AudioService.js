@@ -15,6 +15,7 @@ class AudioService {
     this.inputStreamSource = null;
     this.scriptProcessor = null;
 
+    this.inputGainNode = this.context.createGain();
     this.outputGainNode = this.context.createGain();
 
     this.analyser = this.context.createAnalyser();
@@ -50,7 +51,8 @@ class AudioService {
       const inputStreamSource = this.context.createMediaStreamSource(stream);
       const scriptProcessor = this.context.createScriptProcessor(BUFFER_SIZE, 2, 2);
 
-      inputStreamSource.connect(scriptProcessor);
+      inputStreamSource.connect(this.inputGainNode);
+      this.inputGainNode.connect(scriptProcessor);
       scriptProcessor.connect(this.context.destination);
 
       scriptProcessor.onaudioprocess = (node) => {
@@ -108,7 +110,8 @@ class AudioService {
     }
 
     this.localStream.getAudioTracks().forEach(track => track.stop());
-    this.inputStreamSource.disconnect(this.scriptProcessor);
+    this.inputStreamSource.disconnect(this.inputGainNode);
+    this.inputGainNode.disconnect(this.scriptProcessor);
     this.scriptProcessor.disconnect(this.context.destination);
     this.localStream = null;
   }
@@ -133,6 +136,10 @@ class AudioService {
 
   changeOutputGain(value) {
     this.outputGainNode.gain.value = value;
+  }
+
+  changeInputGain(value) {
+    this.inputGainNode.gain.value = value;
   }
 
   getAnalyser() {

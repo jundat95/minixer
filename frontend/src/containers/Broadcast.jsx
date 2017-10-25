@@ -29,10 +29,10 @@ class Broadcast extends React.Component {
     const half = Math.floor(spectrums.length / 2);
     const last = spectrums.length - 1;
 
-    const red = `00${Math.floor(spectrums[0] / 2).toString(16).toUpperCase()}`.substr(-2);
-    const green = `00${Math.floor(spectrums[half] / 2).toString(16).toUpperCase()}`.substr(-2);
-    const blue = `00${Math.floor(spectrums[last] / 2).toString(16).toUpperCase()}`.substr(-2);
-    const backgroundColor = `#${red}${green}${blue}`;
+    const red = Math.floor(spectrums[0] / 2);
+    const green = Math.floor(spectrums[half] / 2);
+    const blue = Math.floor(spectrums[last] / 2);
+    const backgroundColor = `rgb(${red}, ${green}, ${blue})`;
 
     return (
       <div style={{ backgroundColor }}>

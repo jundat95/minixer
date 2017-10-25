@@ -12,6 +12,9 @@ import {
   Button,
 } from 'react-bootstrap';
 
+import Slider from 'react-rangeslider';
+import 'react-rangeslider/lib/index.css';
+
 import Util from '../Util';
 import AudioService from '../services/AudioService';
 import SocketService from '../services/SocketService';
@@ -28,6 +31,7 @@ export default class RoomControlPanel extends React.Component {
       deviceId: '',
       bitRate: 192,
       outputGain: 1.0,
+      inputGain: 100,
       isMute: false,
     };
   }
@@ -91,6 +95,11 @@ export default class RoomControlPanel extends React.Component {
     AudioService.stopCapture();
   }
 
+  handleChangeInputGain(inputGain) {
+    this.setState({ inputGain });
+    AudioService.changeInputGain(inputGain / 100);
+  }
+
   renderInputSourceSelector() {
     const { sourceList } = this.state;
 
@@ -129,6 +138,21 @@ export default class RoomControlPanel extends React.Component {
     );
   }
 
+  renderInputGainSlider() {
+    return (
+      <FormGroup>
+        <ControlLabel>Input Gain</ControlLabel>
+        <Slider
+          min={0}
+          max={120}
+          step={1}
+          value={this.state.inputGain}
+          onChange={value => this.handleChangeInputGain(value)}
+        />
+      </FormGroup>
+    );
+  }
+
   renderSoundPanel() {
     const { sourceList } = this.state;
     if (!sourceList || Object.keys(sourceList).length < 1) {
@@ -140,8 +164,9 @@ export default class RoomControlPanel extends React.Component {
         <Panel bsStyle="primary" header="Audio">
           {this.renderInputSourceSelector()}
           {this.renderBitRateSelector()}
+          {this.renderInputGainSlider()}
           <Checkbox checked={this.state.isMute} onChange={e => this.handleMuteChange(e)}>
-            <FontAwesome iconName="volume-off" />Mute
+            <FontAwesome iconName="volume-off" />Playback Mute
           </Checkbox>
           {this.state.isCapture ? (
             <Button bsStyle="danger" onClick={() => this.handleStopCapture()} block>
