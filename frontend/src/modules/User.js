@@ -6,6 +6,8 @@ const initialState = {
   id: null,
   name: null,
   token: null,
+  roomId: null,
+  isAdminUser: false,
 };
 
 export default function user(state = initialState, action) {
@@ -16,17 +18,16 @@ export default function user(state = initialState, action) {
       newState.id = action.id;
       newState.name = action.name;
       newState.token = action.token;
+      newState.roomId = action.roomId;
+      newState.isAdminUser = action.isAdminUser;
       return newState;
     default:
       return state;
   }
 }
 
-export function setUser(id, name, token) {
-  return {
+export function setUser(data) {
+  return Object.assign({
     type: SET_INFO,
-    id,
-    name,
-    token,
-  };
+  }, data);
 }

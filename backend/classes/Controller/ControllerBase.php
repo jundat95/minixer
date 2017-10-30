@@ -14,7 +14,7 @@ abstract class ControllerBase
     protected function returnJsonResponse(bool $result, $data = null, $code = 200)
     {
         $responseData = ['result' => $result];
-        if (!empty($data)) {
+        if (is_array($data) || !empty($data)) {
             $responseData['data'] = $data;
         }
 

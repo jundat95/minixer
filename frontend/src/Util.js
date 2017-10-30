@@ -8,7 +8,8 @@ export default class Util {
   }
 
   static getFormattedDate(time) {
-    const date = new Date(time * 1000);
+    const mtime = (time * 1000);
+    const date = new Date(mtime);
     const Y = date.getFullYear();
     const M = `0${date.getMonth() + 1}`.slice(-2);
     const D = `0${date.getDate()}`.slice(-2);

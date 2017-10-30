@@ -13,6 +13,7 @@ const EVENT_ROOM_JOIN = 'room_join';
 const EVENT_ROOM_EMOTION = 'room_emotion';
 const EVENT_ROOM_EXTEND = 'room_extend';
 const EVENT_ROOM_END = 'room_end';
+const EVENT_ROOM_TERMINATE = 'room_terminate';
 const EVENT_ERROR = 'error';
 
 const handleReceivedEvent = (state, payload) => {
@@ -20,23 +21,31 @@ const handleReceivedEvent = (state, payload) => {
   const newState = _.cloneDeep(state);
 
   switch (eventType) {
-    case EVENT_ROOM_JOIN:
+    case EVENT_ROOM_JOIN: {
       newState.isRoomOpen = true;
-      newState.maxUserCount = payload.maxUserCount;
-      newState.currentUserCount = payload.currentUserCount;
-      newState.emotionCountById = payload.emotionCountById;
-      newState.endTime = payload.endTime;
-      newState.diffTime = Util.getTimestamp() - payload.currentTime;
-      newState.name = payload.name;
-      newState.broadcastList = [];
+      const room = payload.room;
+      newState.name = room.name;
+      newState.maxUserCount = room.max_member_count;
+      newState.currentUserCount = room.current_member_count;
+      newState.expire = room.expire;
+      newState.endTime = room.accessed_at + room.expire;
+      newState.extendCount = room.extend_count;
+      newState.startTime = room.created_at;
+      newState.diffTime = Util.getTimestamp() - room.accessed_at;
+      newState.isRoomMaster = payload.is_room_master;
       return newState;
-    case EVENT_ROOM_EMOTION:
-      newState.emotionCountById = payload.emotionCountById;
+    }
+    case EVENT_ROOM_EXTEND: {
+      const room = payload.room;
+      newState.expire = room.expire;
+      newState.endTime = room.accessed_at + room.expire;
+      newState.extendCount = room.extend_count;
+      newState.startTime = room.created_at;
+      newState.diffTime = Util.getTimestamp() - room.accessed_at;
       return newState;
-    case EVENT_ROOM_EXTEND:
-      newState.remainTime = payload.remainTime;
-      return newState;
+    }
     case EVENT_ROOM_END:
+    case EVENT_ROOM_TERMINATE:
       newState.isRoomOpen = false;
       return newState;
     case EVENT_ERROR:
@@ -51,16 +60,19 @@ const handleReceivedEvent = (state, payload) => {
 const initialState = {
   isConnected: false,
   isRoomOpen: false,
+  isRoomMaster: false,
   name: '',
   maxUserCount: 0,
   currentUserCount: 0,
   emotionCountById: {},
+  extendCount: 0,
   endTime: 0,
+  expire: 0,
+  startTime: 0,
   diffTime: 0,
   isEmitError: false,
   isReceiveError: false,
   lastErrorReason: null,
-  broadcastList: [],
 };
 
 export default function roomSocket(state = initialState, action) {
@@ -94,12 +106,14 @@ export default function roomSocket(state = initialState, action) {
   }
 }
 
-export function connect() {
+export function setReceiveEvent() {
   return (dispatch) => {
     [
       EVENT_ROOM_JOIN,
       EVENT_ROOM_EXTEND,
       EVENT_ROOM_EMOTION,
+      EVENT_ROOM_END,
+      EVENT_ROOM_TERMINATE,
       EVENT_ERROR,
     ].forEach((eventType) => {
       SocketService.on(eventType, (data) => {
@@ -107,10 +121,12 @@ export function connect() {
         dispatch({ type: RECEIVE_EVENT, payload });
       });
     });
-
-    SocketService.connect();
-    dispatch({ type: CONNECT });
   };
+}
+
+export function connect() {
+  SocketService.connect();
+  return { type: CONNECT };
 }
 
 export function emit(type, data) {

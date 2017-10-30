@@ -3,7 +3,7 @@
 namespace Minixer\Controller;
 
 use Minixer\Entity\User;
-use Minixer\Repository\TokenRepository;
+use Minixer\Repository\UserRepository;
 use Minixer\Util\DateTimeUtil;
 use Minixer\Util\SessionUtil;
 use Minixer\Util\StringUtil;
@@ -12,11 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class LoginCallbackController extends ControllerBase
 {
-    private $tokenRepository;
+    private $userRepository;
 
-    public function __construct(TokenRepository $tokenRepository)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->tokenRepository = $tokenRepository;
+        $this->userRepository = $userRepository;
     }
 
     public function __invoke(Request $request)
@@ -61,7 +61,7 @@ class LoginCallbackController extends ControllerBase
             ]);
 
             SessionUtil::setUser($userData);
-            $this->tokenRepository->set($json->id_str, $apiToken);
+            $this->userRepository->set($userData);
         } catch (\Exception $e) {
             SessionUtil::removeUser();
             throw $e;

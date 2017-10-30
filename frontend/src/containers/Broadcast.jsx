@@ -9,39 +9,20 @@ import * as RoomSocketActions from '../modules/RoomSocket';
 
 import FromServer from '../FromServer';
 import Header from '../components/Header';
-import RoomControlPanel from '../components/RoomControlPanel';
+import RoomControlPanel from '../components/Broadcast/RoomControlPanel';
+import Visualizer from '../components/Broadcast/Visualizer';
 
-import AudioService from '../services/AudioService';
+const Broadcast = (props) => {
+  const { user } = FromServer;
 
-class Broadcast extends React.Component {
-  componentWillMount() {
-    const { user } = FromServer;
-    this.props.userActions.setUser(user.id, user.name, user.token);
-  }
-
-  render() {
-    const { user } = FromServer;
-
-    const analyser = AudioService.getAnalyser();
-    const spectrums = new Uint8Array(analyser.fftSize);
-    analyser.getByteTimeDomainData(spectrums);
-
-    const half = Math.floor(spectrums.length / 2);
-    const last = spectrums.length - 1;
-
-    const red = Math.floor(spectrums[0] / 2);
-    const green = Math.floor(spectrums[half] / 2);
-    const blue = Math.floor(spectrums[last] / 2);
-    const backgroundColor = `rgb(${red}, ${green}, ${blue})`;
-
-    return (
-      <div style={{ backgroundColor }}>
-        <Header path="broadcast" user={user} />
-        <RoomControlPanel {...this.props} />
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Header path="broadcast" user={user} />
+      <RoomControlPanel {...props} />
+      <Visualizer />
+    </div>
+  );
+};
 
 Broadcast.propTypes = {
   roomSocketActions: PropTypes.object.isRequired,

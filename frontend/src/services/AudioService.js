@@ -19,7 +19,7 @@ class AudioService {
     this.outputGainNode = this.context.createGain();
 
     this.analyser = this.context.createAnalyser();
-    this.analyser.fftSize = 128;
+    this.analyser.fftSize = 512;
 
     this.playStartTime = 0;
   }

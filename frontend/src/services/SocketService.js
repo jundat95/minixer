@@ -3,7 +3,6 @@ import SocketIO from 'socket.io-client';
 import FromServer from '../FromServer';
 
 const user = FromServer.user;
-const roomId = FromServer.room_id;
 const url = FromServer.socket_io_url;
 
 class SocketService {
@@ -11,9 +10,9 @@ class SocketService {
     this.socket = SocketIO.connect(
       url,
       {
-        autoConnect: false,
-        reconnection: false,
-        query: `userId=${user.id}&token=${user.token}&name=${user.name}&roomId=${roomId}`,
+        autoConnect: true,
+        reconnection: true,
+        query: `userId=${user.id}&token=${user.token}&name=${user.name}`,
       }
     );
   }

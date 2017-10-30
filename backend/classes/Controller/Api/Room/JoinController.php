@@ -1,0 +1,40 @@
+<?php
+
+namespace Minixer\Controller\Api\Room;
+
+use Minixer\Controller\ControllerBase;
+use Minixer\Service\RoomStateService;
+use Minixer\Util\SessionUtil;
+use Symfony\Component\HttpFoundation\Request;
+
+class JoinController extends ControllerBase
+{
+    private $roomStateService;
+
+    public function __construct(RoomStateService $roomStateService)
+    {
+        $this->roomStateService = $roomStateService;
+    }
+
+    public function __invoke(Request $request)
+    {
+        $userId = $request->request->get('user_id');
+        $token = $request->request->get('token');
+        $this->roomStateService->validateToken($userId, $token);
+
+        $roomId = $request->request->get('room_id');
+        $room = $this->roomStateService->getRoom($roomId);
+        if (empty($room)) {
+            return $this->returnJsonResponse(false, ['message' => 'ROOM_NOT_FOUND']);
+        }
+
+        $newRoom = $this->roomStateService->join($room, $userId);
+        $roomEmotions = $this->roomStateService->getRoomEmotion($roomId);
+
+        return $this->returnJsonResponse(true, [
+            'room' => $this->roomStateService->getRoomProperties($newRoom),
+            'room_emotions' => $this->roomStateService->getRoomEmotionProperties($roomEmotions),
+            'is_room_master' => false,
+        ]);
+    }
+}

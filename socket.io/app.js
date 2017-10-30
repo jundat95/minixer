@@ -1,11 +1,11 @@
 const Https = require('https');
 const fs = require('fs');
 const SocketIO = require('socket.io');
-const Request = require('request');
 
 const User = require('./entity/User');
 const ServerManager = require('./manager/ServerManager');
 const Util = require('./Util');
+const ApiManager = require('./manager/ApiManager');
 
 const config = Util.getConfig();
 
@@ -26,30 +26,30 @@ const io = SocketIO.listen(
 const server = new ServerManager(io);
 
 const authenticate = (clientSocket, next) => {
-  // この辺でユーザー認証
-  const { userId, name, roomId, token } = clientSocket.handshake.query;
+  const { userId, token } = clientSocket.handshake.query;
 
   const host = config.api_host;
   if (host.indexOf('dev.minixer.net') !== -1) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   }
 
-  const query = `${host}/api/authenticate?user_id=${userId}&token=${token}`;
-  Request(query, (error, response, body) => {
-    const data = body !== undefined ? JSON.parse(body) : null;
-    if (!data || !data.result) {
-      console.error(`detect invalid user access, ${userId}, ${token}`);
-      next(new Error('authentication failed'));
-      return;
-    }
+  ApiManager.roomUser(
+    userId,
+    token,
+    (data) => {
+      if (!data.result) {
+        console.error(`detect invalid user access, ${userId}, ${token}`);
+        next(new Error('authentication failed'));
+        return;
+      }
 
-    console.log(`connected, ${userId}, ${name}, ${token}`);
-    const isAdminUser = data.is_admin_user;
-    clientSocket.user = new User(userId, name, clientSocket, isAdminUser);
-    clientSocket.apiServerToken = token;
-    clientSocket.roomId = roomId;
-    next();
-  });
+      console.info(`connected, ${userId}, ${token}`);
+      const isAdminUser = data.is_admin_user;
+      const roomId = data.room_id;
+      clientSocket.user = new User(userId, token, clientSocket, isAdminUser, roomId);
+      next();
+    }
+  );
 };
 
 io.use(authenticate);

@@ -1,10 +1,10 @@
 class User {
-  constructor(id, name, socket, isAdminUser) {
+  constructor(id, token, socket, isAdminUser, roomId) {
     this.id = id;
-    this.name = name;
+    this.token = token;
     this.socket = socket;
-    this.roomId = null;
     this.isAdminUser = isAdminUser;
+    this.roomId = roomId;
   }
 }
 

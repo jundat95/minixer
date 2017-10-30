@@ -27,6 +27,34 @@ class Redis
         return self::$redisInstances[$namespace];
     }
 
+    public static function getShardingCount($prefix)
+    {
+        $keys = array_keys(self::$config);
+        $count = 0;
+        foreach ($keys as $key) {
+            if (strpos($key, $prefix) === 0) {
+                ++$count;
+            }
+        }
+        return $count;
+    }
+
+    public static function getNamespaceForSharding($prefix, $id)
+    {
+        $count = self::getShardingCount($prefix);
+        if ($count < 1) {
+            return 'default';
+        }
+
+        $index = $id % $count;
+        $targetKey = $prefix . '_' . $index;
+        if (!isset(self::$config[$targetKey])) {
+            return 'default';
+        }
+
+        return $targetKey;
+    }
+
     /**
      * @param $namespace
      * @return array

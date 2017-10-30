@@ -1,0 +1,9 @@
+.range-slider-red .rangeslider__fill {
+    background-color: darkred;
+}
+.range-slider-blue .rangeslider__fill {
+    background-color: darkblue;
+}
+.range-slider-green .rangeslider__fill {
+    background-color: darkgreen;
+}
