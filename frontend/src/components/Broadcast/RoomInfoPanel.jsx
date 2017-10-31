@@ -24,6 +24,14 @@ export default class RoomInfoPanel extends React.Component {
     SocketService.emit('room_finish', {}, () => {});
   }
 
+  handleExtendRoom() {
+    SocketService.emit('room_extend', { count: 1 }, (response) => {
+      if (!response.result) {
+        alert('延長処理に失敗しました');
+      }
+    });
+  }
+
   renderEndAt() {
     const { endTime } = this.props.roomSocket;
     return Util.getFormattedDate(endTime);

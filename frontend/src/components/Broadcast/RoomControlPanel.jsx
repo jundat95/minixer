@@ -98,14 +98,6 @@ export default class RoomControlPanel extends React.Component {
     clearInterval(this.interval);
   }
 
-  handleExtendRoom() {
-    SocketService.emit('room_extend', { count: 1 }, (response) => {
-      if (!response.result) {
-        alert('延長処理に失敗しました');
-      }
-    });
-  }
-
   renderClosedPanel() {
     if (!this.state.roomClosed) {
       return null;

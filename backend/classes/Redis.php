@@ -20,7 +20,7 @@ class Redis
         if (!isset(self::$redisInstances[$namespace])) {
             list($host, $port, $timeout, $db) = self::getConfig($namespace);
             $redis = new \Redis();
-            $redis->pconnect($host, $port, $timeout);
+            $redis->connect($host, $port, $timeout);
             $redis->select($db);
             self::$redisInstances[$namespace] = $redis;
         }
