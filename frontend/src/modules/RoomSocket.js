@@ -10,10 +10,12 @@ const EMIT_ERROR = 'room_socket/emit_error';
 const RECEIVE_EVENT = 'room_socket/receive_event';
 
 const EVENT_ROOM_JOIN = 'room_join';
+const EVENT_ROOM_JOIN_OTHER = 'room_joined';
 const EVENT_ROOM_EMOTION = 'room_emotion';
 const EVENT_ROOM_EXTEND = 'room_extend';
 const EVENT_ROOM_END = 'room_end';
 const EVENT_ROOM_TERMINATE = 'room_terminate';
+const EVENT_ROOM_LEAVE = 'room_leaved';
 const EVENT_ERROR = 'error';
 
 const handleReceivedEvent = (state, payload) => {
@@ -33,6 +35,17 @@ const handleReceivedEvent = (state, payload) => {
       newState.startTime = room.created_at;
       newState.diffTime = Util.getTimestamp() - room.accessed_at;
       newState.isRoomMaster = payload.is_room_master;
+      return newState;
+    }
+    case EVENT_ROOM_JOIN_OTHER: {
+      const room = payload.room;
+      newState.maxUserCount = room.max_member_count;
+      newState.currentUserCount = room.current_member_count;
+      return newState;
+    }
+    case EVENT_ROOM_LEAVE: {
+      const room = payload.room;
+      newState.currentUserCount = room.current_member_count;
       return newState;
     }
     case EVENT_ROOM_EXTEND: {
@@ -110,6 +123,8 @@ export function setReceiveEvent() {
   return (dispatch) => {
     [
       EVENT_ROOM_JOIN,
+      EVENT_ROOM_JOIN_OTHER,
+      EVENT_ROOM_LEAVE,
       EVENT_ROOM_EXTEND,
       EVENT_ROOM_EMOTION,
       EVENT_ROOM_END,

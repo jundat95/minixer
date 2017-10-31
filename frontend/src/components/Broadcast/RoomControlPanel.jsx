@@ -1,19 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import {
   Grid,
   Row,
   Col,
   PanelGroup,
   Panel,
-  Button,
 } from 'react-bootstrap';
 
-import Util from '../../Util';
 import AudioService from '../../services/AudioService';
 import SocketService from '../../services/SocketService';
 import FromServer from '../../FromServer';
 
+import FontAwesome from '../FontAwesome';
+import RoomInfoPanel from './RoomInfoPanel';
 import SoundControlPanel from './SoundControlPanel';
 
 export default class RoomControlPanel extends React.Component {
@@ -21,50 +22,60 @@ export default class RoomControlPanel extends React.Component {
     super();
 
     this.state = {
-      sourceList: {},
-      isCapture: false,
-      deviceId: '',
-      bitRate: 192,
-      outputGain: 100,
-      inputGain: 100,
-      isMute: false,
+      secondsElapsed: 0,
       showSoundPanel: true,
       showRoomPanel: true,
+      roomClosed: false,
     };
   }
 
   componentWillMount() {
     this.props.roomSocketActions.setReceiveEvent();
 
-    AudioService.getSourceList(sourceList => this.setState({ sourceList }));
     SocketService.on('connected_minixer', data => this.handleConnected(data));
+    SocketService.on('room_join', () => {
+      this.interval = setInterval(() => this.setState({ secondsElapsed: this.state.secondsElapsed + 1 }), 1000);
+    });
     SocketService.on('room_broadcast', data => this.handleRoomBroadcast(data));
     SocketService.on('room_end', () => this.handleRoomEnd());
     SocketService.on('room_terminate', () => this.handleRoomEnd());
   }
 
-  getPlayedTime() {
-    const { startTime, diffTime } = this.props.roomSocket;
-    const time = Util.getTimestamp();
-    return (time - startTime) + diffTime;
+  componentWillReceiveProps(nextProps) {
+    const { roomSocket } = this.props;
+    const nextRoomSocket = nextProps.roomSocket;
+    if (!roomSocket.isRoomMaster && nextRoomSocket.isRoomMaster) {
+      AudioService.getSourceList(sourceList => this.props.roomControlActions.setState('sourceList', sourceList));
+    }
   }
 
-  getRemainTime() {
-    const { endTime, diffTime } = this.props.roomSocket;
-    const time = Util.getTimestamp();
-    return (endTime - time) + diffTime;
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   handleConnected(data) {
-    this.props.userActions.setUser(data);
+    const newData = _.cloneDeep(data);
 
-    if (FromServer.room_id === data.id) {
+    if (FromServer.room_id === data.userId) {
       SocketService.emit('room_create', {}, (result) => {
         if (!result.result) {
           alert('ルーム作成に失敗しました');
         }
       });
+    } else {
+      newData.roomId = FromServer.room_id;
+      const emitData = { roomId: FromServer.room_id };
+
+      SocketService.emit('room_join', emitData, (result) => {
+        if (!result.result && result.message === 'ROOM_NOT_FOUND') {
+          this.setState({ roomClosed: true });
+        } else {
+          alert('ルームへの入室に失敗しました');
+        }
+      });
     }
+
+    this.props.userActions.setUser(newData);
   }
 
   handleRoomBroadcast(data) {
@@ -82,60 +93,9 @@ export default class RoomControlPanel extends React.Component {
     if (this.state.isCapture) {
       AudioService.stopCapture();
     }
-  }
 
-  handleSourceChange(e) {
-    const { value } = e.target;
-    this.setState({ deviceId: value });
-  }
-
-  handleBitRateChange(e) {
-    const { value } = e.target;
-    this.setState({ bitRate: value });
-  }
-
-  handleMuteChange(e) {
-    const { checked } = e.target;
-    if (checked) {
-      AudioService.changeOutputGain(0);
-    } else {
-      AudioService.changeOutputGain(this.state.outputGain / 100);
-    }
-
-    this.setState({ isMute: checked });
-  }
-
-  handleStartCapture() {
-    const { roomSocketActions } = this.props;
-    AudioService.startCapture(
-      this.state.deviceId,
-      this.state.bitRate,
-      (blob, duration) => {
-        const payload = { type: 'audio_buffer', blob, duration };
-        roomSocketActions.emit('room_broadcast', payload);
-      }
-    );
-
-    this.setState({ isCapture: true });
-  }
-
-  handleStopCapture() {
-    this.setState({ isCapture: false });
-    AudioService.stopCapture();
-  }
-
-  handleChangeInputGain(inputGain) {
-    this.setState({ inputGain });
-    AudioService.changeInputGain(inputGain / 100);
-  }
-
-  handleChangeOutputGain(outputGain) {
-    this.setState({ outputGain });
-    AudioService.changeOutputGain(outputGain / 100);
-  }
-
-  handleCloseRoom() {
-    SocketService.emit('room_finish', {}, () => {});
+    this.setState({ roomClosed: true });
+    clearInterval(this.interval);
   }
 
   handleExtendRoom() {
@@ -146,108 +106,15 @@ export default class RoomControlPanel extends React.Component {
     });
   }
 
-  renderSoundPanel() {
-    const { sourceList } = this.state;
-    if (!sourceList || Object.keys(sourceList).length < 1) {
-      return null;
-    }
-    const { isRoomOpen } = this.props.roomSocket;
-    if (!isRoomOpen) {
+  renderClosedPanel() {
+    if (!this.state.roomClosed) {
       return null;
     }
 
-    const inputSourceSelectorProps = {
-      sourceList: this.state.sourceList,
-      deviceId: this.state.deviceId,
-      isCapture: this.state.isCapture,
-      handleSourceChange: e => this.handleSourceChange(e),
-    };
-    const bitRateSelectorProps = {
-      bitRate: this.state.bitRate,
-      isCapture: this.state.isCapture,
-      handleBitRateChange: e => this.handleBitRateChange(e),
-    };
-    const inputGainSliderProps = {
-      title: 'Input Gain',
-      gain: this.state.inputGain,
-      handleChangeGain: e => this.handleChangeInputGain(e),
-      sliderColor: 'red',
-    };
-    const outputGainSliderProps = {
-      title: 'Output Gain',
-      gain: this.state.outputGain,
-      handleChangeGain: e => this.handleChangeOutputGain(e),
-      sliderColor: 'blue',
-    };
-
-    const controlPanelProps = {
-      roomSocket: this.props.roomSocket,
-      inputSourceSelectorProps,
-      bitRateSelectorProps,
-      inputGainSliderProps,
-      outputGainSliderProps,
-      muteCheckProps: {
-        checked: this.state.isMute,
-        onChange: e => this.handleMuteChange(e),
-      },
-      isCapture: this.state.isCapture,
-      handleStopCapture: () => this.handleStopCapture(),
-      handleStartCapture: () => this.handleStartCapture(),
-    };
-
     return (
-      <Col xs={12} sm={6}>
-        <SoundControlPanel {...controlPanelProps} />
-      </Col>
-    );
-  }
-
-  renderEndAt() {
-    const { endTime } = this.props.roomSocket;
-    return Util.getFormattedDate(endTime);
-  }
-
-  renderFormattedTime(time) {
-    const h = Math.floor(time / 3600);
-    const m = Math.floor((time - (h * 3600)) / 60);
-    const s = time - ((h * 3600) + (m * 60));
-
-    return `${h}:${`00${m}`.substr(-2)}:${`00${s}`.substr(-2)}`;
-  }
-
-  renderPlayed() {
-    const played = this.getPlayedTime();
-    return this.renderFormattedTime(played);
-  }
-
-  renderRemain() {
-    const remain = this.getRemainTime();
-    return this.renderFormattedTime(remain);
-  }
-
-  renderRoomPanel() {
-    const { roomSocket } = this.props;
-    const twitterUrl = `https://twitter.com/${roomSocket.name}`;
-
-    return (
-      <Col xs={12} sm={6}>
-        <Panel bsStyle="info" header="Room" eventKey="Room" collapsible defaultExpanded>
-          <h6>Room Master</h6>
-          <p><a href={twitterUrl} target="_blank">{roomSocket.name}</a></p>
-          <h6>State</h6>
-          <p>{roomSocket.isRoomOpen ? 'Open' : 'Close'}</p>
-          <h6>End At</h6>
-          <p>{this.renderEndAt()}</p>
-          <h6>Played / Remain</h6>
-          {roomSocket.isRoomOpen ? this.renderPlayed() : 0}
-          &nbsp;/&nbsp;
-          {roomSocket.isRoomOpen ? this.renderRemain() : 0}
-          {roomSocket.isRoomOpen && roomSocket.isRoomMaster ? (
-            <Button bsStyle="warning" onClick={() => this.handleCloseRoom()} block>Close</Button>
-          ) : null}
-          {roomSocket.isRoomOpen && roomSocket.isRoomMaster && roomSocket.extendCount <= 10 ? (
-            <Button bsStyle="success" onClick={() => this.handleExtendRoom()} block>Extend</Button>
-          ) : null}
+      <Col xs={12}>
+        <Panel bsStyle="warning" header={(<span><FontAwesome iconName="warning" />Room is already closed</span>)}>
+          This room is closed...
         </Panel>
       </Col>
     );
@@ -258,8 +125,15 @@ export default class RoomControlPanel extends React.Component {
       <Grid>
         <PanelGroup>
           <Row>
-            {this.renderRoomPanel()}
-            {this.renderSoundPanel()}
+            {this.renderClosedPanel()}
+          </Row>
+          <Row>
+            <Col xs={12} sm={6}>
+              <RoomInfoPanel {...this.props} />
+            </Col>
+            <Col xs={12} sm={6}>
+              <SoundControlPanel {...this.props} />
+            </Col>
           </Row>
         </PanelGroup>
       </Grid>
@@ -272,4 +146,6 @@ RoomControlPanel.propTypes = {
   userActions: PropTypes.object.isRequired,
   roomSocket: PropTypes.object.isRequired,
   roomSocketActions: PropTypes.object.isRequired,
+  roomControl: PropTypes.object.isRequired,
+  roomControlActions: PropTypes.object.isRequired,
 };

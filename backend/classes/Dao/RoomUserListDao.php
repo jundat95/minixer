@@ -28,6 +28,6 @@ class RoomUserListDao extends RoomRedisDaoBase
 
     public function getCount($roomId)
     {
-        return (int)$this->getRedis($roomId)->sCard($this->getKey($roomId));
+        return (int)$this->getRedis($roomId)->sCard($this->getKey($roomId)) - 1;
     }
 }

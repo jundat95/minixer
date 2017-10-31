@@ -41,7 +41,7 @@ class RoomEmotionRepository
 
         return new RoomEmotionList([
             'room_id' => $roomId,
-            'count_by_ids' => $list,
+            'count_by_id' => $list,
         ]);
     }
 

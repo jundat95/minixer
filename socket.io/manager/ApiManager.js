@@ -2,10 +2,7 @@ const Axios = require('axios');
 const Util = require('../Util');
 
 const successFunction = (response, cb) => {
-  const { status, data } = response;
-  if (status !== 200 || data.result !== true) {
-    cb({ result: false });
-  }
+  const { data } = response;
   cb(data);
 };
 

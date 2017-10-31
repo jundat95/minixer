@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import AudioService from '../../services/AudioService';
 
@@ -30,9 +31,22 @@ export default class Visualizer extends React.Component {
       const barWidth = (CANVAS_WIDTH / bufferLength) * 1.5;
 
       let x = 0;
+      const { visualizerColor } = this.props.roomControl;
       for (let i = 0; i < bufferLength; i++) {
         const decibel = spectrums[i];
-        const rgb = [50, 50, (decibel + 100)];
+        const rgb = [50, 50, 50];
+        if (visualizerColor === 'red') {
+          rgb[0] = decibel + 100;
+        } else if (visualizerColor === 'green') {
+          rgb[1] = decibel + 100;
+        } else if (visualizerColor === 'blue') {
+          rgb[2] = decibel + 100;
+        } else {
+          const color = Math.max(decibel, 50);
+          rgb[0] = color;
+          rgb[1] = color;
+          rgb[2] = color;
+        }
         context.fillStyle = `rgb(${rgb.join(', ')})`;
 
         const h = Math.floor((decibel / 255) * CANVAS_HEIGHT);
@@ -61,3 +75,7 @@ export default class Visualizer extends React.Component {
     );
   }
 }
+
+Visualizer.propTypes = {
+  roomControl: PropTypes.object.isRequired,
+};

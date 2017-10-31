@@ -4,8 +4,8 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import * as UserActions from '../modules/User';
-
 import * as RoomSocketActions from '../modules/RoomSocket';
+import * as RoomControlActions from '../modules/RoomControl';
 
 import FromServer from '../FromServer';
 import Header from '../components/Header';
@@ -19,7 +19,7 @@ const Broadcast = (props) => {
     <div>
       <Header path="broadcast" user={user} />
       <RoomControlPanel {...props} />
-      <Visualizer />
+      <Visualizer {...props} />
     </div>
   );
 };
@@ -27,15 +27,18 @@ const Broadcast = (props) => {
 Broadcast.propTypes = {
   roomSocketActions: PropTypes.object.isRequired,
   userActions: PropTypes.object.isRequired,
+  roomControl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({
   user: state.user,
   roomSocket: state.roomSocket,
+  roomControl: state.roomControl,
 });
 const mapDispatchToProps = dispatch => ({
   userActions: bindActionCreators(UserActions, dispatch),
   roomSocketActions: bindActionCreators(RoomSocketActions, dispatch),
+  roomControlActions: bindActionCreators(RoomControlActions, dispatch),
 });
 
 export default connect(

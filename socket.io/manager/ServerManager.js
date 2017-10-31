@@ -16,7 +16,7 @@ class ServerManager {
     }
 
     socket.emit('connected_minixer', {
-      id: user.id,
+      userId: user.id,
       token: user.token,
       roomId: user.roomId,
       isAdminUser: user.isAdminUser,
@@ -26,11 +26,13 @@ class ServerManager {
   unregisterClient(socket) {
     const { user } = socket;
 
-    // if (user.roomId) {
-    //   ApiManager.roomLeave(user.id, user.token, user.roomId, () => {
-    //     console.info(`room leaved: ${user.id} -> ${user.roomId}`);
-    //   });
-    // }
+    if (user.roomId && user.roomId !== user.id) {
+      ApiManager.roomLeave(user.id, user.token, user.roomId, (response) => {
+        console.info(`room leaved: ${user.id} -> ${user.roomId}`);
+        const responseData = response.data;
+        socket.to(user.roomId).emit('room_leaved', responseData);
+      });
+    }
   }
 
   onRoomCreate(socket, data, cb) {
@@ -65,7 +67,8 @@ class ServerManager {
 
     ApiManager.roomJoin(userId, token, roomId, (response) => {
       if (!response.result) {
-        cb({ result: false });
+        const message = response.data !== undefined ? response.data.message : null;
+        cb({ result: false, message });
         return;
       }
 
@@ -73,6 +76,8 @@ class ServerManager {
       socket.join(roomId, () => {
         user.roomId = roomId;
         socket.emit('room_join', responseData);
+        socket.to(roomId).emit('room_joined', responseData);
+        console.info(`room joined: ${user.id} -> ${roomId}`);
       });
 
       socket.on('room_emotion', (data2, cb2) => this.onRoomEmotion(socket, data2, cb2));
