@@ -21,11 +21,13 @@ export default class RoomInfoPanel extends React.Component {
   }
 
   handleCloseRoom() {
-    SocketService.emit('room_finish', {}, () => {});
+    const { roomSocketActions } = this.props;
+    roomSocketActions.emit('room_finish', {}, () => {});
   }
 
   handleExtendRoom() {
-    SocketService.emit('room_extend', { count: 1 }, (response) => {
+    const { roomSocketActions } = this.props;
+    roomSocketActions.emit('room_extend', { count: 1 }, (response) => {
       if (!response.result) {
         alert('延長処理に失敗しました');
       }
@@ -110,4 +112,5 @@ export default class RoomInfoPanel extends React.Component {
 
 RoomInfoPanel.propTypes = {
   roomSocket: PropTypes.object.isRequired,
+  roomSocketActions: PropTypes.object.isRequired,
 };

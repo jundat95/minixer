@@ -178,15 +178,6 @@ class RoomStateService
 
     public function join(Room $room, $userId)
     {
-        $roomUser = $this->roomUserRepository->get($userId);
-        $roomId = $roomUser->getRoomId();
-        if (!empty($roomId)) {
-            $userRoom = $this->roomRepository->get($roomId);
-            if (!empty($userRoom)) {
-                throw new \Exception('cannot join room');
-            }
-        }
-
         $newRoom = $this->roomRepository->joinUser($room->getId(), $userId);
         return $newRoom;
     }

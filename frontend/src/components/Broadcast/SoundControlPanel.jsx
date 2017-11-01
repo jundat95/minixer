@@ -57,7 +57,8 @@ export default class SoundControlPanel extends React.Component {
 
   handleBitRateChange(e) {
     const { value } = e.target;
-    this.props.roomControlActions.setState('bitRate', value);
+    const bitRate = parseInt(value, 10);
+    this.props.roomControlActions.setState('bitRate', bitRate);
   }
 
   handleStartCapture() {

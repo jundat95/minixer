@@ -24,6 +24,7 @@ export default class Emotion extends React.Component {
   }
 
   renderEmotionCount(id) {
+    const { roomSocketActions } = this.props;
     const { isRoomMaster, emotionCountById } = this.props.roomSocket;
     const count = emotionCountById[id] || 0;
 
@@ -43,7 +44,7 @@ export default class Emotion extends React.Component {
         return;
       }
 
-      SocketService.emit('room_emotion', { id }, (result) => {
+      roomSocketActions.emit('room_emotion', { id }, (result) => {
         if (!result.result) {
           alert('failed to send emotion');
         } else {
@@ -88,7 +89,7 @@ export default class Emotion extends React.Component {
     return (
       <Panel bsStyle="success" header={header} eventKey="emotion" collapsible defaultExpanded>
         <div className="center-block">
-          <Table>
+          <Table style={{ marginBottom: 0, backgroundColor: '#404040' }}>
             <tbody>
               <tr>
                 {Object.keys(EmotionMaster).map(id => this.renderEmotionIcon(id))}
@@ -106,4 +107,5 @@ export default class Emotion extends React.Component {
 
 Emotion.propTypes = {
   roomSocket: PropTypes.object.isRequired,
+  roomSocketActions: PropTypes.object.isRequired,
 };

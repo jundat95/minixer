@@ -64,6 +64,7 @@ abstract class ControllerBase
                 'last_loaded_at' => $user->getLastLoadedAt()->getTimestamp(),
                 'is_admin_user' => in_array($user->getId(), $adminUserIds),
             ] : null,
+            'is_debug' => $GLOBALS['app']['debug'],
         ];
 
         if (isset($data['json'])) {

@@ -12,6 +12,7 @@ let settings = {
     'pages/index': ['babel-polyfill', `${src}/pages/index.jsx`],
     'pages/mypage': ['babel-polyfill', `${src}/pages/mypage.jsx`],
     'pages/broadcast': ['babel-polyfill', `${src}/pages/broadcast.jsx`],
+    'workers/encoding': ['babel-polyfill', `${src}/workers/encoding.js`],
   },
   module: {
     loaders: [

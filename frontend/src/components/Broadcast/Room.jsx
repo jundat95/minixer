@@ -55,10 +55,11 @@ export default class Room extends React.Component {
   }
 
   handleConnected(data) {
+    const { roomSocketActions } = this.props;
     const newData = _.cloneDeep(data);
 
     if (FromServer.room_id === data.userId) {
-      SocketService.emit('room_create', {}, (result) => {
+      roomSocketActions.emit('room_create', {}, (result) => {
         if (!result.result) {
           alert('ルーム作成に失敗しました');
         }
@@ -67,7 +68,7 @@ export default class Room extends React.Component {
       newData.roomId = FromServer.room_id;
       const emitData = { roomId: FromServer.room_id };
 
-      SocketService.emit('room_join', emitData, (result) => {
+      roomSocketActions.emit('room_join', emitData, (result) => {
         if (!result.result && result.message === 'ROOM_NOT_FOUND') {
           this.setState({ roomClosed: true });
         } else {
@@ -86,7 +87,7 @@ export default class Room extends React.Component {
     }
 
     const { blob, duration } = payload;
-    AudioService.decodeAndPlay(blob, duration, 0);
+    AudioService.decodeAndPlay(blob, duration);
   }
 
   handleRoomEnd() {

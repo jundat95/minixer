@@ -1,11 +1,12 @@
-import LameJS from 'lamejs';
+import FromServer from '../FromServer';
+
+const isDebug = FromServer.is_debug;
 
 const AudioContext = window.AudioContext
   || window.webkitAudioContext
   || false;
 
 const BUFFER_SIZE = 16384;
-const BLOCK_SIZE = 1152;
 
 class AudioService {
   constructor() {
@@ -22,6 +23,11 @@ class AudioService {
     this.analyser.fftSize = 512;
 
     this.playStartTime = 0;
+    if (isDebug) {
+      this.worker = new Worker('/js/workers/encoding.bundle.js');
+    } else {
+      this.worker = new Worker('/js/workers/encoding.bundle.min.js');
+    }
   }
 
   getSourceList(callback) {
@@ -46,6 +52,7 @@ class AudioService {
       },
       video: false,
     };
+    const sampleRate = this.context.sampleRate;
 
     navigator.mediaDevices.getUserMedia(params).then((stream) => {
       const inputStreamSource = this.context.createMediaStreamSource(stream);
@@ -57,9 +64,15 @@ class AudioService {
 
       scriptProcessor.onaudioprocess = (node) => {
         const { inputBuffer } = node;
-        const mp3Data = this.encodePCMtoMP3(inputBuffer, bitRate);
-        const blob = new Blob(mp3Data, { type: 'audio/mp3' });
-        callback(blob, inputBuffer.duration);
+        const left = inputBuffer.getChannelData(0);
+        const right = inputBuffer.getChannelData(1);
+
+        this.worker.onmessage = (event) => {
+          const mp3Data = event.data;
+          const blob = new Blob(mp3Data, { type: 'audio/mp3' });
+          callback(blob, inputBuffer.duration);
+        };
+        this.worker.postMessage({ left, right, sampleRate, bitRate });
       };
 
       this.localStream = stream;
@@ -67,41 +80,6 @@ class AudioService {
       this.scriptProcessor = scriptProcessor;
       this.isCapture = true;
     });
-  }
-
-  encodePCMtoMP3(inputBuffer, bitRate) {
-    const mp3Encoder = new LameJS.Mp3Encoder(2, this.context.sampleRate, bitRate);
-
-    const left = inputBuffer.getChannelData(0);
-    const left16bit = this.convertBuffer(left);
-    const right = inputBuffer.getChannelData(1);
-    const right16bit = this.convertBuffer(right);
-
-    const blocks = [];
-    let remaining = left16bit.length;
-    for (let i = 0; remaining >= 0; i += BLOCK_SIZE) {
-      const leftBuf = left16bit.subarray(i, i + BLOCK_SIZE);
-      const rightBuf = right16bit.subarray(i, i + BLOCK_SIZE);
-      const mp3Buf = mp3Encoder.encodeBuffer(leftBuf, rightBuf);
-      if (mp3Buf.length > 0) {
-        blocks.push(new Int8Array(mp3Buf));
-      }
-      remaining -= BLOCK_SIZE;
-    }
-
-    blocks.push(new Int8Array(mp3Encoder.flush()));
-
-    return blocks;
-  }
-
-  convertBuffer(arrayBuffer) {
-    const input = new Float32Array(arrayBuffer);
-    const output = new Int16Array(arrayBuffer.length);
-    for (let i = 0; i < input.length; i++) {
-      const s = Math.max(-1, Math.min(1, input[i]));
-      output[i] = (s < 0 ? s * 0x8000 : s * 0x7FFF);
-    }
-    return output;
   }
 
   stopCapture() {
@@ -116,7 +94,7 @@ class AudioService {
     this.localStream = null;
   }
 
-  decodeAndPlay(blob, duration, playDelaySec) {
+  decodeAndPlay(blob, duration) {
     this.context.decodeAudioData(blob, (decodedAudio) => {
       const source = this.context.createBufferSource();
       source.buffer = decodedAudio;
@@ -125,21 +103,23 @@ class AudioService {
       this.outputGainNode.connect(this.context.destination);
 
       const { currentTime } = this.context;
-      if (currentTime < this.playStartTime) {
+      const playStartTime = this.playStartTime;
+      if (currentTime < playStartTime) {
         this.playStartTime += duration;
       } else {
-        this.playStartTime = currentTime + duration + playDelaySec;
+        this.playStartTime = currentTime + duration;
       }
+
       source.start(this.playStartTime);
     });
   }
 
   changeOutputGain(value) {
-    this.outputGainNode.gain.value = value;
+    this.outputGainNode.gain.setTargetAtTime(value, this.context.currentTime, 0.015);
   }
 
   changeInputGain(value) {
-    this.inputGainNode.gain.value = value;
+    this.inputGainNode.gain.setTargetAtTime(value, this.context.currentTime, 0.015);
   }
 
   getAnalyser() {

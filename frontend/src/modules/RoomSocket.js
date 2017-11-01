@@ -149,12 +149,16 @@ export function connect() {
   return { type: CONNECT };
 }
 
-export function emit(type, data) {
+export function emit(type, data, callback = null) {
   return (dispatch) => {
     dispatch({ type: EMIT_EVENT });
     SocketService.emit(type, data, (response) => {
       if (response.result === false) {
         dispatch({ type: EMIT_ERROR, reason: response.reason });
+      }
+
+      if (typeof callback === 'function') {
+        callback(response);
       }
     });
   };

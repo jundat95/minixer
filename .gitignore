@@ -4,6 +4,7 @@ node_modules
 vendor
 logs/*
 backend/public/js/pages/*
+backend/public/js/workers/*
 .twitter-secrets
 .twitter-secrets-production
 .DS_Store
