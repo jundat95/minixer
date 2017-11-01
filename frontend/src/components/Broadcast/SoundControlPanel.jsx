@@ -9,6 +9,7 @@ import {
   FormControl,
 } from 'react-bootstrap';
 
+import Util from '../../Util';
 import AudioService from '../../services/AudioService';
 
 import InputSourceSelector from './InputSourceSelector';
@@ -21,6 +22,14 @@ const DEVICE_ID_KEY = 'default_device_id';
 const VISUALIZER_KEY = 'default_visualizer_color';
 
 export default class SoundControlPanel extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      isPlayStart: false,
+    };
+  }
+
   componentWillMount() {
     const { roomControlActions } = this.props;
 
@@ -197,6 +206,25 @@ export default class SoundControlPanel extends React.Component {
     );
   }
 
+  renderStartAudioButton() {
+    const isIOS = Util.isIOS();
+    const { isRoomMaster } = this.state;
+    const { isPlayStart } = this.state;
+    if (!isIOS || isRoomMaster || isPlayStart) {
+      return null;
+    }
+
+    const handleClick = () => {
+      AudioService.emptyBufferPlayForIOS();
+    };
+
+    return (
+      <Button bsStyle="primary" onClick={() => handleClick()} block>
+        <FontAwesome iconName="play" />Start Audio
+      </Button>
+    );
+  }
+
   render() {
     const { isRoomOpen } = this.props.roomSocket;
     if (!isRoomOpen) {
@@ -210,6 +238,7 @@ export default class SoundControlPanel extends React.Component {
         {this.renderOutputGainSlider()}
         {this.renderVisualizerOption()}
         {this.renderMuteCheckbox()}
+        {this.renderStartAudioButton()}
         {this.renderCaptureButton()}
       </Panel>
     );

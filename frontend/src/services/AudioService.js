@@ -125,6 +125,11 @@ class AudioService {
   getAnalyser() {
     return this.analyser;
   }
+
+  // 最初の start は必ずタップが必要なので空の buffer を start させる
+  emptyBufferPlayForIOS() {
+    this.context.createBufferSource().start(0);
+  }
 }
 
 const instance = new AudioService();

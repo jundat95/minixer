@@ -19,4 +19,8 @@ export default class Util {
 
     return `${Y}/${M}/${D} ${h}:${m}:${s}`;
   }
+
+  static isIOS() {
+    return /iPad|iPhone|iPod/i.test(navigator.userAgent);
+  }
 }
