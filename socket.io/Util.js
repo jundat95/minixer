@@ -29,6 +29,8 @@ class Util {
       api_host: 'https://minixer.net',
       max_room_count: 100,
       max_room_user_count: 200,
+      ssl_key_file: '/etc/ssl/private/localhost.key',
+      ssl_cert_file: '/etc/ssl/certs/localhost.crt',
     }, parsedConfig);
     lastConfigLoaded = time;
 

@@ -8,5 +8,6 @@ backend/public/js/workers/*
 .twitter-secrets
 .twitter-secrets-production
 .DS_Store
+socket.io/config.json
 
 !.gitkeep

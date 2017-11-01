@@ -10,8 +10,8 @@ const ApiManager = require('./manager/ApiManager');
 const config = Util.getConfig();
 
 const httpsServer = Https.createServer({
-  key: fs.readFileSync('/etc/ssl/private/localhost.key').toString(),
-  cert: fs.readFileSync('/etc/ssl/certs/localhost.crt').toString(),
+  key: fs.readFileSync(config.ssl_key_file).toString(),
+  cert: fs.readFileSync(config.ssl_cert_file).toString(),
 });
 httpsServer.listen(config.server_port, '0.0.0.0');
 const io = SocketIO.listen(

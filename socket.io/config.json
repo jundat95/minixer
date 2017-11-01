@@ -1,6 +1,0 @@
-{
-  "server_port": "9999",
-  "api_host": "https://dev.minixer.net",
-  "max_room_count": 100,
-  "max_room_user_count": 200
-}
