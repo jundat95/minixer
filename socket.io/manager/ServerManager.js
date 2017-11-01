@@ -99,6 +99,7 @@ class ServerManager {
 
       const responseData = response.data;
       this.io.to(roomId).emit('room_emotion', responseData);
+      cb({ result: true });
     });
   }
 

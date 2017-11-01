@@ -16,8 +16,9 @@ import FromServer from '../../FromServer';
 import FontAwesome from '../FontAwesome';
 import RoomInfoPanel from './RoomInfoPanel';
 import SoundControlPanel from './SoundControlPanel';
+import Emotion from './Emotion';
 
-export default class RoomControlPanel extends React.Component {
+export default class Room extends React.Component {
   constructor() {
     super();
 
@@ -120,6 +121,11 @@ export default class RoomControlPanel extends React.Component {
             {this.renderClosedPanel()}
           </Row>
           <Row>
+            <Col xs={12}>
+              <Emotion {...this.props} />
+            </Col>
+          </Row>
+          <Row>
             <Col xs={12} sm={6}>
               <RoomInfoPanel {...this.props} />
             </Col>
@@ -133,7 +139,7 @@ export default class RoomControlPanel extends React.Component {
   }
 }
 
-RoomControlPanel.propTypes = {
+Room.propTypes = {
   user: PropTypes.object.isRequired,
   userActions: PropTypes.object.isRequired,
   roomSocket: PropTypes.object.isRequired,

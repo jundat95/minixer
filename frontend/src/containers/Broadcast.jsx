@@ -9,7 +9,7 @@ import * as RoomControlActions from '../modules/RoomControl';
 
 import FromServer from '../FromServer';
 import Header from '../components/Header';
-import RoomControlPanel from '../components/Broadcast/RoomControlPanel';
+import Room from '../components/Broadcast/Room';
 import Visualizer from '../components/Broadcast/Visualizer';
 
 const Broadcast = (props) => {
@@ -18,7 +18,7 @@ const Broadcast = (props) => {
   return (
     <div>
       <Header path="broadcast" user={user} />
-      <RoomControlPanel {...props} />
+      <Room {...props} />
       <Visualizer {...props} />
     </div>
   );

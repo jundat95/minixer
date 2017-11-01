@@ -6,5 +6,6 @@ logs/*
 backend/public/js/pages/*
 .twitter-secrets
 .twitter-secrets-production
+.DS_Store
 
 !.gitkeep

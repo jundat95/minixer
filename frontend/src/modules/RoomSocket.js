@@ -35,6 +35,7 @@ const handleReceivedEvent = (state, payload) => {
       newState.startTime = room.created_at;
       newState.diffTime = Util.getTimestamp() - room.accessed_at;
       newState.isRoomMaster = payload.is_room_master;
+      newState.emotionCountById = payload.room_emotions;
       return newState;
     }
     case EVENT_ROOM_JOIN_OTHER: {
@@ -55,6 +56,10 @@ const handleReceivedEvent = (state, payload) => {
       newState.extendCount = room.extend_count;
       newState.startTime = room.created_at;
       newState.diffTime = Util.getTimestamp() - room.accessed_at;
+      return newState;
+    }
+    case EVENT_ROOM_EMOTION: {
+      newState.emotionCountById = payload.room_emotions;
       return newState;
     }
     case EVENT_ROOM_END:
