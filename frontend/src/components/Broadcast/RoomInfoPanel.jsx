@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Panel, Button } from 'react-bootstrap';
 
 import Util from '../../Util';
-import SocketService from '../../services/SocketService';
+import FromServer from '../../FromServer';
 
 import FontAwesome from '../../components/FontAwesome';
 
@@ -93,6 +93,12 @@ export default class RoomInfoPanel extends React.Component {
 
     return (
       <Panel bsStyle="info" header={header} eventKey="Room" collapsible defaultExpanded>
+        {roomSocket.isRoomMaster ? (
+          <div>
+            <h6>Room URL</h6>
+            <p>{FromServer.room_url}</p>
+          </div>
+        ) : null}
         <h6>Room Master</h6>
         <p><a href={twitterUrl} target="_blank">{roomSocket.name}</a></p>
         <h6>State</h6>

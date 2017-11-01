@@ -14,10 +14,11 @@ import Visualizer from '../components/Broadcast/Visualizer';
 
 const Broadcast = (props) => {
   const { user } = FromServer;
+  const user2 = user === null ? {} : user;
 
   return (
     <div>
-      <Header path="broadcast" user={user} />
+      <Header path="broadcast" user={user2} />
       <Room {...props} />
       <Visualizer {...props} />
     </div>

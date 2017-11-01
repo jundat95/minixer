@@ -26,30 +26,37 @@ const io = SocketIO.listen(
 const server = new ServerManager(io);
 
 const authenticate = (clientSocket, next) => {
-  const { userId, token } = clientSocket.handshake.query;
+  const { userId, token, guestId } = clientSocket.handshake.query;
 
   const host = config.api_host;
   if (host.indexOf('dev.minixer.net') !== -1) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   }
 
-  ApiManager.roomUser(
-    userId,
-    token,
-    (data) => {
-      if (!data.result) {
-        console.error(`detect invalid user access, ${userId}, ${token}`);
-        next(new Error('authentication failed'));
-        return;
-      }
+  if (userId) {
+    ApiManager.roomUser(
+      userId,
+      token,
+      (data) => {
+        if (!data.result) {
+          console.error(`detect invalid user access, ${userId}, ${token}`);
+          next(new Error('authentication failed'));
+          return;
+        }
 
-      console.info(`connected, ${userId}, ${token}`);
-      const isAdminUser = data.is_admin_user;
-      const roomId = data.room_id;
-      clientSocket.user = new User(userId, token, clientSocket, isAdminUser, roomId);
-      next();
-    }
-  );
+        console.info(`connected, ${userId}, ${token}`);
+        const isAdminUser = data.is_admin_user || false;
+        const roomId = data.room_id;
+        clientSocket.user = new User(userId, token, clientSocket, isAdminUser, roomId);
+        next();
+      }
+    );
+  } else {
+    console.info(`connected guest, ${guestId}`);
+    clientSocket.user = new User(guestId, '', clientSocket, false, null);
+    clientSocket.user.setGuest();
+    next();
+  }
 };
 
 io.use(authenticate);

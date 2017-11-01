@@ -14,4 +14,5 @@ return [
     'admin_user_ids' => [
         '107481221',
     ],
+    'base_url' => 'https://dev.minixer.net',
 ];

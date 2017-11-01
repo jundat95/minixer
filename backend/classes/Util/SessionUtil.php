@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class SessionUtil
 {
     const USER_KEY = 'session:user';
+    const GUEST_ID_KEY = 'session:guest_id';
 
     private function __construct()
     {
@@ -52,5 +53,15 @@ class SessionUtil
     public static function removeUser()
     {
         self::getSession()->remove(self::USER_KEY);
+    }
+
+    public static function getGuestId()
+    {
+        return self::getSession()->get(self::GUEST_ID_KEY);
+    }
+
+    public static function setGuestId($id)
+    {
+        self::getSession()->set(self::GUEST_ID_KEY, $id);
     }
 }

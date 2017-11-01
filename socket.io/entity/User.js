@@ -5,6 +5,11 @@ class User {
     this.socket = socket;
     this.isAdminUser = isAdminUser;
     this.roomId = roomId;
+    this.isGuest = false;
+  }
+
+  setGuest() {
+    this.isGuest = true;
   }
 }
 

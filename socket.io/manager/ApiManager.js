@@ -54,10 +54,28 @@ class ApiManager {
     ApiManager.postRequest('/api/room/join', params, cb);
   }
 
+  static roomJoinGuest(guestId, roomId, cb) {
+    const params = {
+      guest_id: guestId,
+      room_id: roomId,
+    };
+
+    ApiManager.postRequest('/api/room/join', params, cb);
+  }
+
   static roomLeave(userId, token, roomId, cb) {
     const params = {
       user_id: userId,
       token,
+      room_id: roomId,
+    };
+
+    ApiManager.postRequest('/api/room/leave', params, cb);
+  }
+
+  static roomLeaveGuest(guestId, roomId, cb) {
+    const params = {
+      guest_id: guestId,
       room_id: roomId,
     };
 
@@ -73,10 +91,8 @@ class ApiManager {
     ApiManager.postRequest('/api/room/update', params, cb);
   }
 
-  static roomEmotion(userId, token, roomId, emotionId, cb) {
+  static roomEmotion(roomId, emotionId, cb) {
     const params = {
-      user_id: userId,
-      token,
       room_id: roomId,
       emotion_id: emotionId,
     };

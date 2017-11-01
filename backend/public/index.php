@@ -51,8 +51,7 @@ $app->get('/reload_profile', 'Minixer\\Controller\\ReloadProfileController')
     ->before($loginRequired);
 $app->get('/broadcast', 'Minixer\\Controller\\BroadcastController')
     ->before($loginRequired);
-$app->get('/room/{room_id}', 'Minixer\\Controller\\RoomController')
-    ->before($loginRequired);
+$app->get('/room/{room_id}', 'Minixer\\Controller\\RoomController');
 
 $app->get('/api/room/user', 'Minixer\\Controller\\Api\\Room\\UserController');
 $app->post('/api/room/create', 'Minixer\\Controller\\Api\\Room\\CreateController');

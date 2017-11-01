@@ -40,6 +40,10 @@ class UserRepository
     public function isValidToken($userId, $token)
     {
         $user = $this->get($userId);
+        if (empty($user)) {
+            return false;
+        }
+
         return $user->getApiToken() === $token;
     }
 }

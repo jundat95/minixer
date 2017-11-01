@@ -10,8 +10,6 @@ import {
 import EmotionMaster from '../../EmotionMaster';
 import FontAwesome from '../FontAwesome';
 
-import SocketService from '../../services/SocketService';
-
 const EMOTION_INTERVAL_MSEC = 5 * 1000;
 
 export default class Emotion extends React.Component {

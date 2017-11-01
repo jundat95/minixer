@@ -19,8 +19,13 @@ class LeaveController extends ControllerBase
     public function __invoke(Request $request)
     {
         $userId = $request->request->get('user_id');
-        $token = $request->request->get('token');
-        $this->roomStateService->validateToken($userId, $token);
+        $guestId = $request->request->get('guest_id');
+        if (!empty($userId)) {
+            $token = $request->request->get('token');
+            $this->roomStateService->validateToken($userId, $token);
+        } else {
+            $userId = 'guest-' . $guestId;
+        }
 
         $roomId = $request->request->get('room_id');
         $room = $this->roomStateService->getRoom($roomId);

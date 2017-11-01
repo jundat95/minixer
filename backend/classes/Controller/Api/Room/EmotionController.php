@@ -18,10 +18,6 @@ class EmotionController extends ControllerBase
 
     public function __invoke(Request $request)
     {
-        $userId = $request->request->get('user_id');
-        $token = $request->request->get('token');
-        $this->roomStateService->validateToken($userId, $token);
-
         $roomId = $request->request->get('room_id');
         $room = $this->roomStateService->getRoom($roomId);
         if (empty($room)) {

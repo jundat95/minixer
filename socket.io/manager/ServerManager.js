@@ -27,11 +27,19 @@ class ServerManager {
     const { user } = socket;
 
     if (user.roomId && user.roomId !== user.id) {
-      ApiManager.roomLeave(user.id, user.token, user.roomId, (response) => {
-        console.info(`room leaved: ${user.id} -> ${user.roomId}`);
-        const responseData = response.data;
-        socket.to(user.roomId).emit('room_leaved', responseData);
-      });
+      if (user.isGuest) {
+        ApiManager.roomLeaveGuest(user.id, user.roomId, (response) => {
+          console.info(`room leaved: ${user.id} -> ${user.roomId}`);
+          const responseData = response.data;
+          socket.to(user.roomId).emit('room_leaved', responseData);
+        });
+      } else {
+        ApiManager.roomLeave(user.id, user.token, user.roomId, (response) => {
+          console.info(`room leaved: ${user.id} -> ${user.roomId}`);
+          const responseData = response.data;
+          socket.to(user.roomId).emit('room_leaved', responseData);
+        });
+      }
     }
   }
 
@@ -64,8 +72,9 @@ class ServerManager {
     const userId = user.id;
     const token = user.token;
     const roomId = data.roomId;
+    const isGuest = user.isGuest;
 
-    ApiManager.roomJoin(userId, token, roomId, (response) => {
+    const joinCallback = (response) => {
       if (!response.result) {
         const message = response.data !== undefined ? response.data.message : null;
         cb({ result: false, message });
@@ -81,7 +90,13 @@ class ServerManager {
       });
 
       socket.on('room_emotion', (data2, cb2) => this.onRoomEmotion(socket, data2, cb2));
-    });
+    };
+
+    if (isGuest) {
+      ApiManager.roomJoinGuest(userId, roomId, response => joinCallback(response));
+    } else {
+      ApiManager.roomJoin(userId, token, roomId, response => joinCallback(response));
+    }
   }
 
   onRoomEmotion(socket, data, cb) {
@@ -91,7 +106,7 @@ class ServerManager {
       return;
     }
 
-    ApiManager.roomEmotion(user.id, user.token, roomId, data.id, (response) => {
+    ApiManager.roomEmotion(roomId, data.id, (response) => {
       if (!response.result) {
         cb({ result: false });
         return;

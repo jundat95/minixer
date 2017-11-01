@@ -216,6 +216,7 @@ export default class SoundControlPanel extends React.Component {
 
     const handleClick = () => {
       AudioService.emptyBufferPlayForIOS();
+      this.setState({ isPlayStart: true });
     };
 
     return (
