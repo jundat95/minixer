@@ -46,4 +46,9 @@ $twitterConfig = parse_ini_file(__DIR__ . '/../.twitter-secrets');
 $app['TWITTER_CONSUMER_KEY'] = $twitterConfig['CONSUMER_KEY'];
 $app['TWITTER_CONSUMER_SECRET'] = $twitterConfig['CONSUMER_SECRET'];
 
+$slackConfig = parse_ini_file(__DIR__ . '/../.slack-webhooks');
+$app['SLACK_WEB_HOOK_ERROR'] = $slackConfig['ERROR'];
+$app['SLACK_WEB_HOOK_LOGIN'] = $slackConfig['LOGIN'];
+$app['SLACK_WEB_HOOK_ROOM_CREATE'] = $slackConfig['ROOM_CREATE'];
+
 $GLOBALS['app'] = $app;

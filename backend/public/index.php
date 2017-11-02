@@ -1,8 +1,10 @@
 <?php
 
-namespace Minixer;
+namespace Minixer\Index;
 
+use Minixer\Application;
 use Minixer\Util\SessionUtil;
+use Minixer\Util\SlackUtil;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,6 +14,15 @@ require_once __DIR__ . '/../bootstrap.php';
 /** @var Application $app */
 $app = $GLOBALS['app'];
 
+function sendToSlackError(\Exception $e, Request $request)
+{
+    try {
+        $text = sprintf("%s\n%s\n%s", $request->getPathInfo(), $e->getMessage(), $e->getTraceAsString());
+        SlackUtil::sendToError($text);
+    } catch (\Exception $ee) {
+    }
+}
+
 $app->before(function (Request $request) use ($app) {
     if (strpos($request->headers->get('Content-Type'), 'application/json') === 0) {
         if ($request->getMethod() === 'POST') {
@@ -20,11 +31,18 @@ $app->before(function (Request $request) use ($app) {
         }
 
         $app->error(function (\Exception $e, Request $request) {
+            sendToSlackError($e, $request);
+
             $response = [
                 'error' => $e->getMessage(),
                 'traces' => $e->getTrace(),
             ];
             return new JsonResponse($response, 500);
+        });
+    } else {
+       $app->error(function (\Exception $e, Request $request) {
+            sendToSlackError($e, $request);
+            return null;
         });
     }
 });

@@ -2,6 +2,7 @@
 
 namespace Minixer\Service;
 
+use Minixer\Config;
 use Minixer\Entity\Room;
 use Minixer\Entity\RoomEmotion;
 use Minixer\Entity\RoomEmotionList;
@@ -11,6 +12,7 @@ use Minixer\Repository\RoomRepository;
 use Minixer\Repository\RoomUserRepository;
 use Minixer\Repository\UserRepository;
 use Minixer\Util\DateTimeUtil;
+use Minixer\Util\SlackUtil;
 
 class RoomStateService
 {
@@ -152,10 +154,23 @@ class RoomStateService
         ]);
         $newRoomUser = $this->roomUserRepository->set($newRoomUser);
 
+        $this->sendToSlackCreated($room);
+
         return [
             'room' => $room,
             'room_user' => $newRoomUser,
         ];
+    }
+
+    private function sendToSlackCreated(Room $room)
+    {
+        try {
+            $id = $room->getId();
+            $url = Config::getInstance()->get('base_url') . '/room/' . $id;
+            $text = sprintf("Name: %s\nID: %s\nURL: <%s>", $room->getName(), $id, $url);
+            SlackUtil::sendToRoomCreated($text);
+        } catch (\Exception $e) {
+        }
     }
 
     public function getRoom($roomId)

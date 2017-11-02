@@ -6,7 +6,7 @@ logs/*
 backend/public/js/pages/*
 backend/public/js/workers/*
 .twitter-secrets
-.twitter-secrets-production
+.slack-webhooks
 .DS_Store
 socket.io/config.json
 .state

@@ -7,6 +7,7 @@ use Minixer\Repository\UserRepository;
 use Minixer\Util\DateTimeUtil;
 use Minixer\Util\SessionUtil;
 use Minixer\Util\StringUtil;
+use Minixer\Util\SlackUtil;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -67,6 +68,16 @@ class LoginCallbackController extends ControllerBase
             throw $e;
         }
 
+        $this->sendToSlack($userData);
         return new RedirectResponse('/mypage');
+    }
+
+    private function sendToSlack(User $user)
+    {
+        try {
+            $text = sprintf("ID: %s\nName: %s", $user->getId(), $user->getName());
+            SlackUtil::sendToLogin($text);
+        } catch (\Exception $e) {
+        }
     }
 }
