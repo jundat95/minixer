@@ -1,6 +1,7 @@
 const Https = require('https');
 const fs = require('fs');
 const SocketIO = require('socket.io');
+const SocketIORedis = require('socket.io-redis');
 
 const User = require('./entity/User');
 const ServerManager = require('./manager/ServerManager');
@@ -22,6 +23,7 @@ const io = SocketIO.listen(
     pingInterval: 5000,
   }
 );
+io.adapter(SocketIORedis({ host: '127.0.0.1', port: 6379 }));
 
 const server = new ServerManager(io);
 
